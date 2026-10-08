@@ -39,6 +39,7 @@ import {
   YAxis,
 } from "recharts"
 import { toast, Toaster } from "sonner"
+import SettingsPage from "@/pages/SettingsPage"
 import {
   Dialog,
   DialogContent,
@@ -321,7 +322,7 @@ function App() {
   function chooseSection(label: string) {
     setActiveSection(label)
     setIsMobileNavOpen(false)
-    if (label === "Integrations" || label === "Settings") {
+    if (label === "Integrations") {
       toast(`${label} workspace settings are coming soon.`)
     }
   }
@@ -354,7 +355,7 @@ function App() {
           : "Here's what's happening with your leads today."
 
   return (
-    <div className="app-shell">
+    <div className={`app-shell ${activeSection === "Settings" ? "settings-view" : ""}`}>
       <Toaster position="bottom-right" richColors />
       <button
         aria-label="Close navigation"
@@ -403,7 +404,8 @@ function App() {
         <nav aria-label="Workspace settings" className="side-nav">
           {workspaceNavigation.map(({ label, icon: Icon }) => (
             <button
-              className="nav-item"
+              aria-current={activeSection === label ? "page" : undefined}
+              className={`nav-item ${activeSection === label ? "nav-item-active" : ""}`}
               key={label}
               onClick={() => chooseSection(label)}
               type="button"
@@ -492,445 +494,469 @@ function App() {
         </header>
 
         <div className="page-content">
-          <section className="page-heading">
-            <div>
-              <div className="eyebrow">
-                <span className="eyebrow-dot" /> {today}
-              </div>
-              <h1>{sectionTitle}</h1>
-              <p>{sectionDescription}</p>
-            </div>
-            <div className="heading-actions">
-              <button className="button button-secondary" onClick={exportLeads} type="button">
-                <Download size={16} /> Export
-              </button>
-              <button
-                className="button button-primary"
-                onClick={() => setIsAddLeadOpen(true)}
-                type="button"
-              >
-                <Plus size={17} /> Add lead
-              </button>
-            </div>
-          </section>
-
-          <section aria-label="Lead performance" className="metric-grid">
-            <article className="metric-card">
-              <div className="metric-topline">
-                <span className="metric-label">Total leads</span>
-                <span className="metric-icon metric-icon-teal">
-                  <Users size={17} />
-                </span>
-              </div>
-              <div className="metric-value">12,842</div>
-              <div className="metric-foot">
-                <span className="metric-change">
-                  <ArrowUpRight size={14} /> 12.8%
-                </span>
-                <span>vs. last month</span>
-              </div>
-            </article>
-            <article className="metric-card">
-              <div className="metric-topline">
-                <span className="metric-label">Qualified leads</span>
-                <span className="metric-icon metric-icon-sand">
-                  <Target size={17} />
-                </span>
-              </div>
-              <div className="metric-value">3,641</div>
-              <div className="metric-foot">
-                <span className="metric-change">
-                  <ArrowUpRight size={14} /> 8.2%
-                </span>
-                <span>vs. last month</span>
-              </div>
-            </article>
-            <article className="metric-card">
-              <div className="metric-topline">
-                <span className="metric-label">Avg. lead score</span>
-                <span className="metric-icon metric-icon-lilac">
-                  <Sparkles size={17} />
-                </span>
-              </div>
-              <div className="metric-value">
-                74<span className="metric-value-unit">/100</span>
-              </div>
-              <div className="metric-foot">
-                <span className="metric-change">
-                  <ArrowUpRight size={14} /> 4.6%
-                </span>
-                <span>vs. last month</span>
-              </div>
-            </article>
-            <article className="metric-card">
-              <div className="metric-topline">
-                <span className="metric-label">Needs review</span>
-                <span className="metric-icon metric-icon-rose">
-                  <Clock3 size={17} />
-                </span>
-              </div>
-              <div className="metric-value">128</div>
-              <div className="metric-foot">
-                <span className="metric-change metric-change-muted">
-                  <ArrowDownRight size={14} /> 2.4%
-                </span>
-                <span>vs. last month</span>
-              </div>
-            </article>
-          </section>
-
-          <section className="insights-grid">
-            <article className="panel trend-panel">
-              <div className="panel-header">
+          {activeSection === "Settings" ? (
+            <SettingsPage />
+          ) : (
+            <>
+              <section className="page-heading">
                 <div>
-                  <div className="panel-title-row">
-                    <h2>Lead activity</h2>
-                    <span className="live-indicator">
-                      <span /> Live
-                    </span>
+                  <div className="eyebrow">
+                    <span className="eyebrow-dot" /> {today}
                   </div>
-                  <p>Lead generation is trending up this week</p>
+                  <h1>{sectionTitle}</h1>
+                  <p>{sectionDescription}</p>
                 </div>
-                <button
-                  className="select-button"
-                  onClick={() => toast("Showing the last 7 days.")}
-                  type="button"
-                >
-                  <CalendarDays size={15} /> Last 7 days <ChevronDown size={14} />
-                </button>
-              </div>
-              <div aria-label="Lead activity chart" className="chart-wrap" role="img">
-                <ResponsiveContainer height="100%" width="100%">
-                  <AreaChart data={trendData} margin={{ top: 12, right: 8, left: -20, bottom: 0 }}>
-                    <defs>
-                      <linearGradient id="leadFill" x1="0" x2="0" y1="0" y2="1">
-                        <stop offset="0%" stopColor="#23877d" stopOpacity={0.18} />
-                        <stop offset="100%" stopColor="#23877d" stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid stroke="#edf0ef" strokeDasharray="3 5" vertical={false} />
-                    <XAxis
-                      axisLine={false}
-                      dataKey="day"
-                      tick={{ fill: "#98a09e", fontSize: 11 }}
-                      tickLine={false}
-                      tickMargin={12}
-                    />
-                    <YAxis
-                      axisLine={false}
-                      domain={[0, 80]}
-                      tick={{ fill: "#98a09e", fontSize: 11 }}
-                      tickLine={false}
-                      ticks={[0, 20, 40, 60, 80]}
-                    />
-                    <Tooltip
-                      contentStyle={{
-                        border: "1px solid #e8ece9",
-                        borderRadius: 10,
-                        boxShadow: "0 8px 24px rgba(25, 44, 40, .1)",
-                        fontSize: 12,
-                      }}
-                      labelStyle={{ color: "#66716e", fontWeight: 600, marginBottom: 4 }}
-                    />
-                    <Area
-                      dataKey="leads"
-                      fill="url(#leadFill)"
-                      name="New leads"
-                      stroke="#23877d"
-                      strokeWidth={2.5}
-                      type="monotone"
-                    />
-                    <Area
-                      dataKey="qualified"
-                      fill="transparent"
-                      name="Qualified"
-                      stroke="#cda263"
-                      strokeDasharray="4 5"
-                      strokeWidth={1.8}
-                      type="monotone"
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-              <div className="chart-legend">
-                <span>
-                  <i className="legend-dot legend-dot-teal" /> New leads
-                </span>
-                <span>
-                  <i className="legend-dot legend-dot-gold" /> Qualified
-                </span>
-                <span className="chart-summary">
-                  +18.4% <span>compared to last week</span>
-                </span>
-              </div>
-            </article>
+                <div className="heading-actions">
+                  <button className="button button-secondary" onClick={exportLeads} type="button">
+                    <Download size={16} /> Export
+                  </button>
+                  <button
+                    className="button button-primary"
+                    onClick={() => setIsAddLeadOpen(true)}
+                    type="button"
+                  >
+                    <Plus size={17} /> Add lead
+                  </button>
+                </div>
+              </section>
 
-            <article className="panel source-panel">
-              <div className="panel-header">
-                <div>
-                  <h2>Lead sources</h2>
-                  <p>Where your leads come from</p>
-                </div>
-                <button
-                  aria-label="More lead source options"
-                  className="icon-button panel-more"
-                  onClick={() => toast("Lead source insights are up to date.")}
-                  type="button"
-                >
-                  <MoreHorizontal size={19} />
-                </button>
-              </div>
-              <div className="source-total">
-                <strong>2,481</strong>
-                <span>leads this month</span>
-              </div>
-              <div className="source-list">
-                <div className="source-item">
-                  <div className="source-meta">
-                    <span>
-                      <i className="source-dot source-dot-teal" /> Website
+              <section aria-label="Lead performance" className="metric-grid">
+                <article className="metric-card">
+                  <div className="metric-topline">
+                    <span className="metric-label">Total leads</span>
+                    <span className="metric-icon metric-icon-teal">
+                      <Users size={17} />
                     </span>
-                    <strong>42%</strong>
                   </div>
-                  <div className="source-track">
-                    <span className="source-fill source-fill-teal" style={{ width: "42%" }} />
-                  </div>
-                </div>
-                <div className="source-item">
-                  <div className="source-meta">
-                    <span>
-                      <i className="source-dot source-dot-gold" /> LinkedIn
+                  <div className="metric-value">12,842</div>
+                  <div className="metric-foot">
+                    <span className="metric-change">
+                      <ArrowUpRight size={14} /> 12.8%
                     </span>
-                    <strong>28%</strong>
+                    <span>vs. last month</span>
                   </div>
-                  <div className="source-track">
-                    <span className="source-fill source-fill-gold" style={{ width: "28%" }} />
-                  </div>
-                </div>
-                <div className="source-item">
-                  <div className="source-meta">
-                    <span>
-                      <i className="source-dot source-dot-blue" /> Referrals
+                </article>
+                <article className="metric-card">
+                  <div className="metric-topline">
+                    <span className="metric-label">Qualified leads</span>
+                    <span className="metric-icon metric-icon-sand">
+                      <Target size={17} />
                     </span>
-                    <strong>18%</strong>
                   </div>
-                  <div className="source-track">
-                    <span className="source-fill source-fill-blue" style={{ width: "18%" }} />
-                  </div>
-                </div>
-                <div className="source-item">
-                  <div className="source-meta">
-                    <span>
-                      <i className="source-dot source-dot-lilac" /> Other
+                  <div className="metric-value">3,641</div>
+                  <div className="metric-foot">
+                    <span className="metric-change">
+                      <ArrowUpRight size={14} /> 8.2%
                     </span>
-                    <strong>12%</strong>
+                    <span>vs. last month</span>
                   </div>
-                  <div className="source-track">
-                    <span className="source-fill source-fill-lilac" style={{ width: "12%" }} />
+                </article>
+                <article className="metric-card">
+                  <div className="metric-topline">
+                    <span className="metric-label">Avg. lead score</span>
+                    <span className="metric-icon metric-icon-lilac">
+                      <Sparkles size={17} />
+                    </span>
                   </div>
-                </div>
-              </div>
-              <button className="text-link" onClick={() => chooseSection("Leads")} type="button">
-                View source report <ArrowRight size={14} />
-              </button>
-            </article>
-          </section>
+                  <div className="metric-value">
+                    74<span className="metric-value-unit">/100</span>
+                  </div>
+                  <div className="metric-foot">
+                    <span className="metric-change">
+                      <ArrowUpRight size={14} /> 4.6%
+                    </span>
+                    <span>vs. last month</span>
+                  </div>
+                </article>
+                <article className="metric-card">
+                  <div className="metric-topline">
+                    <span className="metric-label">Needs review</span>
+                    <span className="metric-icon metric-icon-rose">
+                      <Clock3 size={17} />
+                    </span>
+                  </div>
+                  <div className="metric-value">128</div>
+                  <div className="metric-foot">
+                    <span className="metric-change metric-change-muted">
+                      <ArrowDownRight size={14} /> 2.4%
+                    </span>
+                    <span>vs. last month</span>
+                  </div>
+                </article>
+              </section>
 
-          <section className="bottom-grid">
-            <article className="panel leads-panel">
-              <div className="panel-header leads-panel-header">
-                <div>
-                  <div className="panel-title-row">
-                    <h2>
-                      {activeSection === "Review queue"
-                        ? "Awaiting your review"
-                        : "Recently added leads"}
-                    </h2>
-                    <span className="table-count">{filteredLeads.length}</span>
-                  </div>
-                  <p>Your most recent prospects and their qualification status</p>
-                </div>
-                <div className="table-actions">
-                  <label className="table-search">
-                    <Search size={15} />
-                    <input
-                      aria-label="Filter leads"
-                      onChange={(event) => setSearch(event.target.value)}
-                      placeholder="Filter leads..."
-                      value={search}
-                    />
-                    {search && (
-                      <button aria-label="Clear search" onClick={() => setSearch("")} type="button">
-                        <X size={14} />
-                      </button>
-                    )}
-                  </label>
-                  <label className="filter-control">
-                    <Filter size={14} />
-                    <select
-                      aria-label="Filter by lead status"
-                      onChange={(event) =>
-                        setStatusFilter(event.target.value as (typeof statusFilters)[number])
-                      }
-                      value={statusFilter}
-                    >
-                      {statusFilters.map((status) => (
-                        <option key={status}>{status}</option>
-                      ))}
-                    </select>
-                  </label>
-                </div>
-              </div>
-
-              <div className="table-scroll">
-                <table className="leads-table">
-                  <thead>
-                    <tr>
-                      <th scope="col">Lead</th>
-                      <th scope="col">Company</th>
-                      <th scope="col">Source</th>
-                      <th scope="col">Score</th>
-                      <th scope="col">Status</th>
-                      <th aria-label="Actions" scope="col" />
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredLeads.length > 0 ? (
-                      filteredLeads.map((lead) => (
-                        <tr key={lead.id}>
-                          <td>
-                            <div className="lead-identity">
-                              <Avatar initials={lead.initials} tone={lead.avatar} />
-                              <span>
-                                <strong>{lead.name}</strong>
-                                <small>{lead.title}</small>
-                              </span>
-                            </div>
-                          </td>
-                          <td>
-                            <div className="company-cell">
-                              <span className="company-icon">
-                                <Building2 size={14} />
-                              </span>
-                              <span>{lead.company}</span>
-                            </div>
-                          </td>
-                          <td>
-                            <span className="source-label">{lead.source}</span>
-                          </td>
-                          <td>
-                            <div className="score-cell">
-                              <span
-                                className={`score-number ${lead.score >= 80 ? "score-strong" : ""}`}
-                              >
-                                {lead.score}
-                              </span>
-                              <span className="score-track">
-                                <i style={{ width: `${lead.score}%` }} />
-                              </span>
-                            </div>
-                          </td>
-                          <td>
-                            <span
-                              className={`status-pill status-${lead.status.toLowerCase().replace(" ", "-")}`}
-                            >
-                              <i />
-                              {lead.status}
-                            </span>
-                          </td>
-                          <td>
-                            <button
-                              aria-label={`More options for ${lead.name}`}
-                              className="row-more"
-                              onClick={() => toast(`${lead.name} · ${lead.email}`)}
-                              type="button"
-                            >
-                              <MoreHorizontal size={18} />
-                            </button>
-                          </td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td className="empty-state" colSpan={6}>
-                          <span className="empty-state-icon">
-                            <Search size={17} />
-                          </span>
-                          <strong>No leads found</strong>
-                          <small>Try another search or status filter.</small>
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-              <div className="table-footer">
-                <span>
-                  Showing <strong>{filteredLeads.length}</strong> of <strong>{leads.length}</strong>{" "}
-                  leads
-                </span>
-                <button className="text-link" onClick={() => chooseSection("Leads")} type="button">
-                  View all leads <ArrowRight size={14} />
-                </button>
-              </div>
-            </article>
-
-            <article className="panel activity-panel">
-              <div className="panel-header">
-                <div>
-                  <div className="panel-title-row">
-                    <h2>Recent activity</h2>
-                    <span className="activity-live">
-                      <i /> Live
-                    </span>
-                  </div>
-                  <p>What's happening across your workspace</p>
-                </div>
-                <button
-                  aria-label="More activity options"
-                  className="icon-button panel-more"
-                  onClick={() => chooseSection("Activity")}
-                  type="button"
-                >
-                  <MoreHorizontal size={19} />
-                </button>
-              </div>
-              <div className="activity-feed">
-                {activityFeed.map((item, index) => (
-                  <div className="activity-item" key={item.initials}>
-                    <Avatar initials={item.initials} tone={item.avatar} />
-                    <div className="activity-copy">
-                      <p>
-                        <strong>{item.title}</strong> {item.action}
-                      </p>
-                      <span>{item.time}</span>
+              <section className="insights-grid">
+                <article className="panel trend-panel">
+                  <div className="panel-header">
+                    <div>
+                      <div className="panel-title-row">
+                        <h2>Lead activity</h2>
+                        <span className="live-indicator">
+                          <span /> Live
+                        </span>
+                      </div>
+                      <p>Lead generation is trending up this week</p>
                     </div>
-                    {index === 0 && <span className="activity-new" />}
+                    <button
+                      className="select-button"
+                      onClick={() => toast("Showing the last 7 days.")}
+                      type="button"
+                    >
+                      <CalendarDays size={15} /> Last 7 days <ChevronDown size={14} />
+                    </button>
                   </div>
-                ))}
-              </div>
-              <button
-                className="activity-link"
-                onClick={() => chooseSection("Activity")}
-                type="button"
-              >
-                <span>See all activity</span>
-                <ArrowRight size={15} />
-              </button>
-            </article>
-          </section>
+                  <div aria-label="Lead activity chart" className="chart-wrap" role="img">
+                    <ResponsiveContainer height="100%" width="100%">
+                      <AreaChart
+                        data={trendData}
+                        margin={{ top: 12, right: 8, left: -20, bottom: 0 }}
+                      >
+                        <defs>
+                          <linearGradient id="leadFill" x1="0" x2="0" y1="0" y2="1">
+                            <stop offset="0%" stopColor="#23877d" stopOpacity={0.18} />
+                            <stop offset="100%" stopColor="#23877d" stopOpacity={0} />
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid stroke="#edf0ef" strokeDasharray="3 5" vertical={false} />
+                        <XAxis
+                          axisLine={false}
+                          dataKey="day"
+                          tick={{ fill: "#98a09e", fontSize: 11 }}
+                          tickLine={false}
+                          tickMargin={12}
+                        />
+                        <YAxis
+                          axisLine={false}
+                          domain={[0, 80]}
+                          tick={{ fill: "#98a09e", fontSize: 11 }}
+                          tickLine={false}
+                          ticks={[0, 20, 40, 60, 80]}
+                        />
+                        <Tooltip
+                          contentStyle={{
+                            border: "1px solid #e8ece9",
+                            borderRadius: 10,
+                            boxShadow: "0 8px 24px rgba(25, 44, 40, .1)",
+                            fontSize: 12,
+                          }}
+                          labelStyle={{ color: "#66716e", fontWeight: 600, marginBottom: 4 }}
+                        />
+                        <Area
+                          dataKey="leads"
+                          fill="url(#leadFill)"
+                          name="New leads"
+                          stroke="#23877d"
+                          strokeWidth={2.5}
+                          type="monotone"
+                        />
+                        <Area
+                          dataKey="qualified"
+                          fill="transparent"
+                          name="Qualified"
+                          stroke="#cda263"
+                          strokeDasharray="4 5"
+                          strokeWidth={1.8}
+                          type="monotone"
+                        />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <div className="chart-legend">
+                    <span>
+                      <i className="legend-dot legend-dot-teal" /> New leads
+                    </span>
+                    <span>
+                      <i className="legend-dot legend-dot-gold" /> Qualified
+                    </span>
+                    <span className="chart-summary">
+                      +18.4% <span>compared to last week</span>
+                    </span>
+                  </div>
+                </article>
 
-          <footer className="page-footer">
-            <span>© 2026 Pinpoint, Inc.</span>
-            <span className="footer-links">
-              <button onClick={() => toast("Help center opened.")} type="button">
-                <CircleHelp size={13} /> Help center
-              </button>
-              <button onClick={() => toast("Email support at hello@pinpoint.app")} type="button">
-                <Mail size={13} /> Contact support
-              </button>
-            </span>
-          </footer>
+                <article className="panel source-panel">
+                  <div className="panel-header">
+                    <div>
+                      <h2>Lead sources</h2>
+                      <p>Where your leads come from</p>
+                    </div>
+                    <button
+                      aria-label="More lead source options"
+                      className="icon-button panel-more"
+                      onClick={() => toast("Lead source insights are up to date.")}
+                      type="button"
+                    >
+                      <MoreHorizontal size={19} />
+                    </button>
+                  </div>
+                  <div className="source-total">
+                    <strong>2,481</strong>
+                    <span>leads this month</span>
+                  </div>
+                  <div className="source-list">
+                    <div className="source-item">
+                      <div className="source-meta">
+                        <span>
+                          <i className="source-dot source-dot-teal" /> Website
+                        </span>
+                        <strong>42%</strong>
+                      </div>
+                      <div className="source-track">
+                        <span className="source-fill source-fill-teal" style={{ width: "42%" }} />
+                      </div>
+                    </div>
+                    <div className="source-item">
+                      <div className="source-meta">
+                        <span>
+                          <i className="source-dot source-dot-gold" /> LinkedIn
+                        </span>
+                        <strong>28%</strong>
+                      </div>
+                      <div className="source-track">
+                        <span className="source-fill source-fill-gold" style={{ width: "28%" }} />
+                      </div>
+                    </div>
+                    <div className="source-item">
+                      <div className="source-meta">
+                        <span>
+                          <i className="source-dot source-dot-blue" /> Referrals
+                        </span>
+                        <strong>18%</strong>
+                      </div>
+                      <div className="source-track">
+                        <span className="source-fill source-fill-blue" style={{ width: "18%" }} />
+                      </div>
+                    </div>
+                    <div className="source-item">
+                      <div className="source-meta">
+                        <span>
+                          <i className="source-dot source-dot-lilac" /> Other
+                        </span>
+                        <strong>12%</strong>
+                      </div>
+                      <div className="source-track">
+                        <span className="source-fill source-fill-lilac" style={{ width: "12%" }} />
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    className="text-link"
+                    onClick={() => chooseSection("Leads")}
+                    type="button"
+                  >
+                    View source report <ArrowRight size={14} />
+                  </button>
+                </article>
+              </section>
+
+              <section className="bottom-grid">
+                <article className="panel leads-panel">
+                  <div className="panel-header leads-panel-header">
+                    <div>
+                      <div className="panel-title-row">
+                        <h2>
+                          {activeSection === "Review queue"
+                            ? "Awaiting your review"
+                            : "Recently added leads"}
+                        </h2>
+                        <span className="table-count">{filteredLeads.length}</span>
+                      </div>
+                      <p>Your most recent prospects and their qualification status</p>
+                    </div>
+                    <div className="table-actions">
+                      <label className="table-search">
+                        <Search size={15} />
+                        <input
+                          aria-label="Filter leads"
+                          onChange={(event) => setSearch(event.target.value)}
+                          placeholder="Filter leads..."
+                          value={search}
+                        />
+                        {search && (
+                          <button
+                            aria-label="Clear search"
+                            onClick={() => setSearch("")}
+                            type="button"
+                          >
+                            <X size={14} />
+                          </button>
+                        )}
+                      </label>
+                      <label className="filter-control">
+                        <Filter size={14} />
+                        <select
+                          aria-label="Filter by lead status"
+                          onChange={(event) =>
+                            setStatusFilter(event.target.value as (typeof statusFilters)[number])
+                          }
+                          value={statusFilter}
+                        >
+                          {statusFilters.map((status) => (
+                            <option key={status}>{status}</option>
+                          ))}
+                        </select>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div className="table-scroll">
+                    <table className="leads-table">
+                      <thead>
+                        <tr>
+                          <th scope="col">Lead</th>
+                          <th scope="col">Company</th>
+                          <th scope="col">Source</th>
+                          <th scope="col">Score</th>
+                          <th scope="col">Status</th>
+                          <th aria-label="Actions" scope="col" />
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredLeads.length > 0 ? (
+                          filteredLeads.map((lead) => (
+                            <tr key={lead.id}>
+                              <td>
+                                <div className="lead-identity">
+                                  <Avatar initials={lead.initials} tone={lead.avatar} />
+                                  <span>
+                                    <strong>{lead.name}</strong>
+                                    <small>{lead.title}</small>
+                                  </span>
+                                </div>
+                              </td>
+                              <td>
+                                <div className="company-cell">
+                                  <span className="company-icon">
+                                    <Building2 size={14} />
+                                  </span>
+                                  <span>{lead.company}</span>
+                                </div>
+                              </td>
+                              <td>
+                                <span className="source-label">{lead.source}</span>
+                              </td>
+                              <td>
+                                <div className="score-cell">
+                                  <span
+                                    className={`score-number ${lead.score >= 80 ? "score-strong" : ""}`}
+                                  >
+                                    {lead.score}
+                                  </span>
+                                  <span className="score-track">
+                                    <i style={{ width: `${lead.score}%` }} />
+                                  </span>
+                                </div>
+                              </td>
+                              <td>
+                                <span
+                                  className={`status-pill status-${lead.status.toLowerCase().replace(" ", "-")}`}
+                                >
+                                  <i />
+                                  {lead.status}
+                                </span>
+                              </td>
+                              <td>
+                                <button
+                                  aria-label={`More options for ${lead.name}`}
+                                  className="row-more"
+                                  onClick={() => toast(`${lead.name} · ${lead.email}`)}
+                                  type="button"
+                                >
+                                  <MoreHorizontal size={18} />
+                                </button>
+                              </td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr>
+                            <td className="empty-state" colSpan={6}>
+                              <span className="empty-state-icon">
+                                <Search size={17} />
+                              </span>
+                              <strong>No leads found</strong>
+                              <small>Try another search or status filter.</small>
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                  <div className="table-footer">
+                    <span>
+                      Showing <strong>{filteredLeads.length}</strong> of{" "}
+                      <strong>{leads.length}</strong> leads
+                    </span>
+                    <button
+                      className="text-link"
+                      onClick={() => chooseSection("Leads")}
+                      type="button"
+                    >
+                      View all leads <ArrowRight size={14} />
+                    </button>
+                  </div>
+                </article>
+
+                <article className="panel activity-panel">
+                  <div className="panel-header">
+                    <div>
+                      <div className="panel-title-row">
+                        <h2>Recent activity</h2>
+                        <span className="activity-live">
+                          <i /> Live
+                        </span>
+                      </div>
+                      <p>What's happening across your workspace</p>
+                    </div>
+                    <button
+                      aria-label="More activity options"
+                      className="icon-button panel-more"
+                      onClick={() => chooseSection("Activity")}
+                      type="button"
+                    >
+                      <MoreHorizontal size={19} />
+                    </button>
+                  </div>
+                  <div className="activity-feed">
+                    {activityFeed.map((item, index) => (
+                      <div className="activity-item" key={item.initials}>
+                        <Avatar initials={item.initials} tone={item.avatar} />
+                        <div className="activity-copy">
+                          <p>
+                            <strong>{item.title}</strong> {item.action}
+                          </p>
+                          <span>{item.time}</span>
+                        </div>
+                        {index === 0 && <span className="activity-new" />}
+                      </div>
+                    ))}
+                  </div>
+                  <button
+                    className="activity-link"
+                    onClick={() => chooseSection("Activity")}
+                    type="button"
+                  >
+                    <span>See all activity</span>
+                    <ArrowRight size={15} />
+                  </button>
+                </article>
+              </section>
+
+              <footer className="page-footer">
+                <span>© 2026 Pinpoint, Inc.</span>
+                <span className="footer-links">
+                  <button onClick={() => toast("Help center opened.")} type="button">
+                    <CircleHelp size={13} /> Help center
+                  </button>
+                  <button
+                    onClick={() => toast("Email support at hello@pinpoint.app")}
+                    type="button"
+                  >
+                    <Mail size={13} /> Contact support
+                  </button>
+                </span>
+              </footer>
+            </>
+          )}
         </div>
       </main>
 
