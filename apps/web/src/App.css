@@ -2308,11 +2308,11 @@
 }
 
 @media (max-width: 760px) {
-  html:has(.app-shell.settings-view) {
+  html:has(.product-shell .settings-layout) {
     scrollbar-width: none;
   }
 
-  html:has(.app-shell.settings-view)::-webkit-scrollbar {
+  html:has(.product-shell .settings-layout)::-webkit-scrollbar {
     display: none;
     width: 0;
   }

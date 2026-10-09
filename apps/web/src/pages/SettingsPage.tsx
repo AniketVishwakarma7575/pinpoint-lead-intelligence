@@ -1,4 +1,4 @@
-import { useState, type FormEvent, type ReactNode } from "react"
+import { useEffect, useState, type FormEvent, type ReactNode } from "react"
 import {
   Bell,
   Building2,
@@ -8,12 +8,18 @@ import {
   Globe2,
   LockKeyhole,
   Mail,
+  SlidersHorizontal,
   ShieldCheck,
+  Target,
   UserRound,
 } from "lucide-react"
 import { toast } from "sonner"
+import { useQueryClient } from "@tanstack/react-query"
+import { PageHeader } from "@/components/common/PageHeader"
+import { SCORE_FACTOR_LABELS, type IcpProfile, type ScoreFactorKey } from "@/types"
+import { useAppStore } from "@/stores/appStore"
 
-type SettingsTab = "Profile" | "Workspace" | "Notifications" | "Security"
+type SettingsTab = "Ideal customer profile" | "Profile" | "Workspace" | "Notifications" | "Security"
 
 type SettingsValues = {
   fullName: string
@@ -67,6 +73,7 @@ function isSettingsValues(value: unknown): value is SettingsValues {
 }
 
 const settingsTabs: Array<{ label: SettingsTab; icon: typeof UserRound }> = [
+  { label: "Ideal customer profile", icon: Target },
   { label: "Profile", icon: UserRound },
   { label: "Workspace", icon: Building2 },
   { label: "Notifications", icon: Bell },
@@ -105,6 +112,16 @@ function Field({ children, label, hint }: { children: ReactNode; label: string; 
 function SettingsPage() {
   const [activeTab, setActiveTab] = useState<SettingsTab>("Profile")
   const [settings, setSettings] = useState(loadSettings)
+  const icp = useAppStore((state) => state.icp)
+  const updateProfile = useAppStore((state) => state.updateProfile)
+  const updateIcp = useAppStore((state) => state.updateIcp)
+  const [draftIcp, setDraftIcp] = useState<IcpProfile>(icp)
+  const queryClient = useQueryClient()
+  const scoreWeightTotal = Object.values(draftIcp.weights).reduce((sum, weight) => sum + weight, 0)
+  const isIcpValid =
+    scoreWeightTotal === 100 &&
+    draftIcp.minEmployees <= draftIcp.maxEmployees &&
+    draftIcp.minRevenue <= draftIcp.maxRevenue
   const initials = settings.fullName
     .trim()
     .split(/\s+/)
@@ -112,19 +129,160 @@ function SettingsPage() {
     .map((part) => part[0]?.toUpperCase() ?? "")
     .join("")
 
+  useEffect(() => {
+    updateProfile({ fullName: settings.fullName, email: settings.email })
+  }, [settings.fullName, settings.email, updateProfile])
+
   function update<K extends keyof SettingsValues>(key: K, value: SettingsValues[K]) {
     setSettings((current) => ({ ...current, [key]: value }))
   }
 
   function saveSettings(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    if (activeTab === "Ideal customer profile" && !isIcpValid) {
+      toast.error("Check the ideal customer profile values and make sure score weights total 100.")
+      return
+    }
     try {
       window.localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings))
+      updateProfile({ fullName: settings.fullName, email: settings.email })
+      updateIcp(draftIcp)
+      void queryClient.invalidateQueries()
       toast.success("Your settings have been saved on this device.")
     } catch (error) {
       console.error("Unable to save workspace settings.", error)
       toast.error("Settings could not be saved. Check your browser storage permissions.")
     }
+  }
+
+  function renderIcp() {
+    const weightTotal = Object.values(draftIcp.weights).reduce((sum, weight) => sum + weight, 0)
+    const factorKeys = Object.keys(draftIcp.weights) as ScoreFactorKey[]
+    const updateWeight = (key: ScoreFactorKey, value: number) =>
+      setDraftIcp((current) => ({
+        ...current,
+        weights: { ...current.weights, [key]: Math.max(0, Math.min(100, value)) },
+      }))
+    const updateNumber = (
+      key: "minEmployees" | "maxEmployees" | "minRevenue" | "maxRevenue",
+      value: number,
+    ) => setDraftIcp((current) => ({ ...current, [key]: Math.max(0, value) }))
+    const updateTags = (key: "industries" | "regions" | "technologies", value: string) =>
+      setDraftIcp((current) => ({
+        ...current,
+        [key]: [
+          ...new Set(
+            value
+              .split(",")
+              .map((item) => item.trim())
+              .filter(Boolean),
+          ),
+        ],
+      }))
+    return (
+      <>
+        <div className="settings-section-heading">
+          <span className="settings-section-icon">
+            <Target size={17} />
+          </span>
+          <div>
+            <h3>Ideal customer profile</h3>
+            <p>Set your target account criteria and transparent score weighting.</p>
+          </div>
+        </div>
+        <div className="icp-settings-section">
+          <h4>
+            <SlidersHorizontal size={15} /> Lead score weights <span>{weightTotal}/100</span>
+          </h4>
+          <p>
+            Weights must add up to 100 points. Score changes apply to every lead in your workspace.
+          </p>
+          <div className="icp-weight-grid">
+            {factorKeys.map((key) => (
+              <label key={key}>
+                <span>{SCORE_FACTOR_LABELS[key]}</span>
+                <input
+                  max={100}
+                  min={0}
+                  onChange={(event) => updateWeight(key, Number(event.target.value))}
+                  type="number"
+                  value={draftIcp.weights[key]}
+                />
+                <small>points</small>
+              </label>
+            ))}
+          </div>
+          {weightTotal !== 100 && (
+            <p className="icp-weight-warning" role="alert">
+              Adjust the weights to total exactly 100 before saving.
+            </p>
+          )}
+        </div>
+        <div className="icp-settings-section">
+          <h4>
+            <Target size={15} /> Firmographic fit
+          </h4>
+          <div className="settings-form-grid">
+            <Field label="Minimum employees">
+              <input
+                min={0}
+                onChange={(event) => updateNumber("minEmployees", Number(event.target.value))}
+                type="number"
+                value={draftIcp.minEmployees}
+              />
+            </Field>
+            <Field label="Maximum employees">
+              <input
+                min={draftIcp.minEmployees}
+                onChange={(event) => updateNumber("maxEmployees", Number(event.target.value))}
+                type="number"
+                value={draftIcp.maxEmployees}
+              />
+            </Field>
+            <Field label="Minimum annual revenue (USD)">
+              <input
+                min={0}
+                onChange={(event) => updateNumber("minRevenue", Number(event.target.value))}
+                type="number"
+                value={draftIcp.minRevenue}
+              />
+            </Field>
+            <Field label="Maximum annual revenue (USD)">
+              <input
+                min={draftIcp.minRevenue}
+                onChange={(event) => updateNumber("maxRevenue", Number(event.target.value))}
+                type="number"
+                value={draftIcp.maxRevenue}
+              />
+            </Field>
+            <Field hint="Separate values with commas." label="Target industries">
+              <textarea
+                onChange={(event) => updateTags("industries", event.target.value)}
+                rows={3}
+                value={draftIcp.industries.join(", ")}
+              />
+            </Field>
+            <Field hint="Separate values with commas." label="Target regions">
+              <textarea
+                onChange={(event) => updateTags("regions", event.target.value)}
+                rows={3}
+                value={draftIcp.regions.join(", ")}
+              />
+            </Field>
+            <Field
+              hint="Technology signals count toward the technology-fit score."
+              label="Target technologies"
+            >
+              <textarea
+                onChange={(event) => updateTags("technologies", event.target.value)}
+                rows={3}
+                value={draftIcp.technologies.join(", ")}
+              />
+            </Field>
+          </div>
+        </div>
+      </>
+    )
   }
 
   function renderProfile() {
@@ -364,6 +522,7 @@ function SettingsPage() {
   }
 
   const tabContent: Record<SettingsTab, () => ReactNode> = {
+    "Ideal customer profile": renderIcp,
     Profile: renderProfile,
     Workspace: renderWorkspace,
     Notifications: renderNotifications,
@@ -372,15 +531,11 @@ function SettingsPage() {
 
   return (
     <>
-      <section className="page-heading settings-page-heading">
-        <div>
-          <div className="eyebrow">
-            <span className="eyebrow-dot" /> WORKSPACE PREFERENCES
-          </div>
-          <h1>Settings</h1>
-          <p>Manage your account, workspace, and notification preferences.</p>
-        </div>
-      </section>
+      <PageHeader
+        description="Manage your ideal customer profile, workspace and account preferences."
+        eyebrow="WORKSPACE PREFERENCES"
+        title="Settings"
+      />
 
       <div className="settings-layout">
         <nav aria-label="Settings sections" className="settings-nav">
@@ -416,6 +571,8 @@ function SettingsPage() {
               <span className="settings-card-eyebrow">YOUR WORKSPACE</span>
               <h2>{activeTab}</h2>
               <p>
+                {activeTab === "Ideal customer profile" &&
+                  "Tune the audience and weights behind every lead score."}
                 {activeTab === "Profile" && "Your personal details and regional preferences."}
                 {activeTab === "Workspace" && "The details your team sees across Pinpoint."}
                 {activeTab === "Notifications" &&
@@ -434,8 +591,16 @@ function SettingsPage() {
 
           {activeTab !== "Security" && (
             <div className="settings-card-footer">
-              <span>Changes are stored in this browser for this device.</span>
-              <button className="button button-primary" type="submit">
+              <span>
+                {activeTab === "Ideal customer profile" && !isIcpValid
+                  ? "Check score weights and target ranges before saving."
+                  : "Changes are stored in this browser for this device."}
+              </span>
+              <button
+                className="button button-primary"
+                disabled={activeTab === "Ideal customer profile" && !isIcpValid}
+                type="submit"
+              >
                 <Check size={15} /> Save changes
               </button>
             </div>
