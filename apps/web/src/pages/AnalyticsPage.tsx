@@ -13,7 +13,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts"
-import { toast } from "sonner"
+import { toast } from "@/lib/notify"
 import { MetricCard, ErrorPanel, LoadingPanel, PageHeader } from "@/components/common/PageHeader"
 import { useDashboardStats } from "@/hooks/useLeadQueries"
 import { leadService } from "@/services/leadService"
@@ -74,6 +74,22 @@ export default function AnalyticsPage() {
       .map(([name, count]) => ({ name, count }))
       .sort((a, b) => b.count - a.count)
       .slice(0, 8)
+    const experienceBands = [
+      { name: "0–1 years", color: "#438477", min: 0, max: 1 },
+      { name: "2–3 years", color: "#315282", min: 2, max: 3 },
+      { name: "4–5 years", color: "#c8922a", min: 4, max: 5 },
+      { name: "6+ years", color: "#82928c", min: 6, max: Infinity },
+    ].map(({ name, color, min, max }) => ({
+      name,
+      color,
+      count: records.filter(
+        (lead) =>
+          lead.experienceYears !== undefined &&
+          lead.experienceYears >= min &&
+          lead.experienceYears <= max,
+      ).length,
+    }))
+    const experienceRecords = records.filter((lead) => lead.experienceYears !== undefined).length
     const scoreBands = [
       {
         name: "80–100",
@@ -113,7 +129,7 @@ export default function AnalyticsPage() {
         color: "#aab4af",
       },
     ]
-    return { buckets, industries, scoreBands, verification }
+    return { buckets, industries, experienceBands, experienceRecords, scoreBands, verification }
   }, [leads.data, period])
 
   async function exportReport() {
@@ -354,6 +370,46 @@ export default function AnalyticsPage() {
           <Link className="product-text-link" to="/leads">
             Explore all leads <ArrowRight size={13} />
           </Link>
+        </article>
+        <article className="product-panel analytics-chart-panel analytics-chart-panel-wide">
+          <div className="product-panel-heading">
+            <div>
+              <h2>Contact experience</h2>
+              <p>Experience levels across contacts with profile data</p>
+            </div>
+            <span className="chart-period">
+              {data.experienceRecords.toLocaleString()} OF {leads.data.length.toLocaleString()}{" "}
+              PROFILES
+            </span>
+          </div>
+          <div className="experience-bands">
+            {data.experienceBands.map((entry) => (
+              <div className="experience-band" key={entry.name}>
+                <div className="experience-band-heading">
+                  <span>
+                    <i style={{ backgroundColor: entry.color }} />
+                    {entry.name}
+                  </span>
+                  <strong>{entry.count.toLocaleString()}</strong>
+                </div>
+                <div
+                  aria-label={`${entry.name}: ${entry.count} leads`}
+                  aria-valuemax={data.experienceRecords}
+                  aria-valuemin={0}
+                  aria-valuenow={entry.count}
+                  className="experience-band-track"
+                  role="progressbar"
+                >
+                  <i
+                    style={{
+                      width: `${data.experienceRecords ? (entry.count / data.experienceRecords) * 100 : 0}%`,
+                      backgroundColor: entry.color,
+                    }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
         </article>
       </section>
     </>

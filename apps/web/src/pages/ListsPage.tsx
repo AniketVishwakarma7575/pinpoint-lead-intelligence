@@ -13,7 +13,7 @@ import {
 } from "lucide-react"
 import { Link } from "react-router"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
-import { toast } from "sonner"
+import { toast } from "@/lib/notify"
 import { Avatar, PriorityPill, ScoreBadge } from "@/components/common/LeadVisuals"
 import { ErrorPanel, LoadingPanel, PageHeader } from "@/components/common/PageHeader"
 import {

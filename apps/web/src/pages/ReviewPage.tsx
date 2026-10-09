@@ -10,7 +10,7 @@ import {
   Sparkles,
 } from "lucide-react"
 import { Link } from "react-router"
-import { toast } from "sonner"
+import { toast } from "@/lib/notify"
 import { ErrorPanel, LoadingPanel, PageHeader } from "@/components/common/PageHeader"
 import { useLead, useLeadMutations, useReviewQueue } from "@/hooks/useLeadQueries"
 import { useAppStore } from "@/stores/appStore"

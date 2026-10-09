@@ -13,7 +13,7 @@ import {
   Target,
   UserRound,
 } from "lucide-react"
-import { toast } from "sonner"
+import { toast } from "@/lib/notify"
 import { useQueryClient } from "@tanstack/react-query"
 import { PageHeader } from "@/components/common/PageHeader"
 import { SCORE_FACTOR_LABELS, type IcpProfile, type ScoreFactorKey } from "@/types"

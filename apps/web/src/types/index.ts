@@ -38,6 +38,7 @@ export type Lead = {
   phone: string
   industry: string
   location: string
+  experienceYears?: number
   employees: number
   revenue: number
   technologies: string[]

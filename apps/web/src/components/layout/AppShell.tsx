@@ -14,8 +14,8 @@ import {
   type LucideIcon,
 } from "lucide-react"
 import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router"
-import { Toaster } from "sonner"
 import { BrandLogo } from "@/components/common/BrandLogo"
+import { PinpointToaster } from "@/components/common/PinpointToaster"
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog"
 import { useReviewQueue } from "@/hooks/useLeadQueries"
 import { useAppStore } from "@/stores/appStore"
@@ -89,7 +89,7 @@ export function AppShell() {
 
   return (
     <div className="product-shell">
-      <Toaster position="bottom-right" richColors />
+      <PinpointToaster />
       <button
         aria-label="Close menu"
         className={`product-scrim ${mobileNavOpen ? "product-scrim-visible" : ""}`}

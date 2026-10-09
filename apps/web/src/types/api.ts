@@ -32,6 +32,7 @@ export const LeadSchema = z.object({
   phone: z.string(),
   industry: z.string().min(1),
   location: z.string().min(1),
+  experienceYears: z.number().int().nonnegative().optional(),
   employees: z.number().int().nonnegative(),
   revenue: z.number().nonnegative(),
   technologies: z.array(z.string()),

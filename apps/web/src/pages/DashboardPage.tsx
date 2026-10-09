@@ -19,7 +19,7 @@ import {
   YAxis,
 } from "recharts"
 import { Link } from "react-router"
-import { toast } from "sonner"
+import { toast } from "@/lib/notify"
 import { ErrorPanel, LoadingPanel, MetricCard, PageHeader } from "@/components/common/PageHeader"
 import { Avatar } from "@/components/common/LeadVisuals"
 import { useDashboardStats, useLeads, useReviewQueue } from "@/hooks/useLeadQueries"

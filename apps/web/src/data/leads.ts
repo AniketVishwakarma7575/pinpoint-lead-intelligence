@@ -75,6 +75,7 @@ function createHeroLeads(): Lead[] {
     phone: "",
     industry: "SaaS",
     location: "Austin, United States",
+    experienceYears: 4,
     employees: 862,
     revenue: 378_750_000,
     technologies: ["HubSpot", "Salesforce", "AWS", "Stripe", "Snowflake", "Segment", "Intercom"],
@@ -291,6 +292,7 @@ function createGeneratedLeads(): Lead[] {
         targetFitSeed || index % 6 !== 0 ? `+1 555 01${String(index % 100).padStart(2, "0")}` : "",
       industry: targetFitSeed ? "SaaS" : industry,
       location: targetFitSeed ? cities[index % 7] : location,
+      experienceYears: index % 11,
       employees: targetFitSeed
         ? faker.number.int({ min: 500, max: 900 })
         : faker.number.int({ min: 8, max: 12_000 }),

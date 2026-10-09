@@ -15,7 +15,7 @@ import {
   UserRoundCheck,
 } from "lucide-react"
 import { Link, useParams } from "react-router"
-import { toast } from "sonner"
+import { toast } from "@/lib/notify"
 import {
   Avatar,
   PriorityPill,

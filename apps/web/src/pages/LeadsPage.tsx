@@ -18,7 +18,7 @@ import {
   X,
 } from "lucide-react"
 import { Link, useSearchParams } from "react-router"
-import { toast } from "sonner"
+import { toast } from "@/lib/notify"
 import { Avatar, PriorityPill, ScoreBadge, VerificationPill } from "@/components/common/LeadVisuals"
 import { ErrorPanel, LoadingPanel, PageHeader } from "@/components/common/PageHeader"
 import {
