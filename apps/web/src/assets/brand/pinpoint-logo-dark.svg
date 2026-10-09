@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="340" height="72" viewBox="0 0 340 72">
+  <rect x="2" y="2" width="68" height="68" rx="19" fill="#0B1B3A"/>
+  <path d="M17 17h17v17H17z" rx="4" fill="#C8922A"/>
+  <path d="M39 17h17a4 4 0 0 1 4 4v9a4 4 0 0 1-4 4H39z" fill="#F7CF6A"/>
+  <path d="M17 39h17v17H17z" rx="4" fill="#F7CF6A"/>
+  <path d="M39 39h17a4 4 0 0 1 4 4v9a4 4 0 0 1-4 4H39z" fill="#C8922A"/>
+  <text x="86" y="49" fill="#F5F7FA" font-family="Inter,Arial,sans-serif" font-size="43" font-weight="650" letter-spacing="-2">pinpoint</text>
+</svg>

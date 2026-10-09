@@ -1,0 +1,180 @@
+/* Pinpoint toast: navy surface, status shown by icon + text, gold only for brand moments. */
+.pp-toast {
+  --pp-surface: #0b1b3a;
+  --pp-text: #ffffff;
+  --pp-muted: #c9d3e6;
+  --pp-gold: #f7cf6a;
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  box-sizing: border-box;
+  width: min(380px, calc(100vw - 24px));
+  padding: 12px 10px 14px 12px;
+  overflow: hidden;
+  color: var(--pp-text);
+  background: var(--pp-surface);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(11, 27, 58, 0.16);
+  font-family: inherit;
+}
+
+.pp-toast__icon {
+  position: relative;
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  color: var(--pp-icon);
+  background: var(--pp-icon-bg);
+}
+.pp-toast[data-variant="success"] {
+  --pp-icon: #4ade80;
+  --pp-icon-bg: rgba(74, 222, 128, 0.14);
+}
+.pp-toast[data-variant="error"] {
+  --pp-icon: #f87171;
+  --pp-icon-bg: rgba(248, 113, 113, 0.14);
+}
+.pp-toast[data-variant="warning"] {
+  --pp-icon: #fbbf24;
+  --pp-icon-bg: rgba(251, 191, 36, 0.14);
+}
+.pp-toast[data-variant="info"] {
+  --pp-icon: #93a8d4;
+  --pp-icon-bg: rgba(147, 168, 212, 0.16);
+}
+.pp-toast[data-variant="loading"] {
+  --pp-icon: var(--pp-gold);
+  --pp-icon-bg: rgba(247, 207, 106, 0.14);
+}
+
+/* The one memorable moment: a single ripple, echoing the ripple under the Pinpoint pin. */
+.pp-toast:not([data-variant="loading"]) .pp-toast__icon::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 1.5px solid currentColor;
+  border-radius: inherit;
+  opacity: 0;
+  animation: pp-toast-ripple 700ms ease-out 120ms 1 both;
+}
+
+.pp-toast__body {
+  flex: 1;
+  min-width: 0;
+  padding-top: 3px;
+}
+.pp-toast__title {
+  margin: 0;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600;
+}
+.pp-toast__desc {
+  margin: 2px 0 0;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--pp-muted);
+  overflow-wrap: anywhere;
+}
+
+.pp-toast__action,
+.pp-toast__close {
+  flex: none;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+  border-radius: 6px;
+  transition:
+    background-color 140ms ease-out,
+    color 140ms ease-out;
+}
+.pp-toast__action {
+  margin-top: 1px;
+  padding: 4px 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--pp-gold);
+}
+.pp-toast__close {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  margin-top: 2px;
+  color: var(--pp-muted);
+}
+.pp-toast__action:hover,
+.pp-toast__close:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+.pp-toast__close:hover {
+  color: var(--pp-text);
+}
+.pp-toast__action:focus-visible,
+.pp-toast__close:focus-visible {
+  outline: 2px solid var(--pp-gold);
+  outline-offset: 2px;
+}
+
+/* Countdown: shows how long the toast stays. Pauses while hovered or focused. */
+.pp-toast__bar {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--pp-gold);
+  opacity: 0.75;
+  transform-origin: left center;
+  animation: pp-toast-shrink linear 1 forwards;
+}
+.pp-toast:hover .pp-toast__bar,
+.pp-toast:focus-within .pp-toast__bar {
+  animation-play-state: paused;
+}
+
+.pp-toast__spin {
+  animation: pp-toast-spin 900ms linear infinite;
+}
+
+@keyframes pp-toast-ripple {
+  from {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.9);
+  }
+}
+@keyframes pp-toast-shrink {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+@keyframes pp-toast-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pp-toast__icon::after {
+    display: none;
+  }
+  .pp-toast__bar {
+    display: none;
+  }
+  .pp-toast__spin {
+    animation-duration: 2.4s;
+  }
+}

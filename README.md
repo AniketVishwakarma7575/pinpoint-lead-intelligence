@@ -14,12 +14,12 @@ so a sales team knows exactly **who to contact first, and why**.
 
 <br/>
 
-![React](https://img.shields.io/badge/React_18-0B1B3A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![React](https://img.shields.io/badge/React_19-0B1B3A?style=for-the-badge&logo=react&logoColor=61DAFB)
 ![TypeScript](https://img.shields.io/badge/TypeScript-0B1B3A?style=for-the-badge&logo=typescript&logoColor=3178C6)
 ![Vite](https://img.shields.io/badge/Vite-0B1B3A?style=for-the-badge&logo=vite&logoColor=F7CF6A)
 ![Tailwind](https://img.shields.io/badge/Tailwind_v4-0B1B3A?style=for-the-badge&logo=tailwindcss&logoColor=38BDF8)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-planned-C8922A?style=for-the-badge&logo=postgresql&logoColor=white)
-![Status](https://img.shields.io/badge/status-prototype-C8922A?style=for-the-badge)
+![Status](https://img.shields.io/badge/status-frontend%20demo-C8922A?style=for-the-badge)
 
 **[Live Demo](#-demo)** &nbsp;•&nbsp; **[Video Walkthrough](#-demo)** &nbsp;•&nbsp; **[Architecture](#-architecture)** &nbsp;•&nbsp; **[Quick Start](#-quick-start)** &nbsp;•&nbsp; **[Roadmap](#-roadmap)**
 
@@ -125,7 +125,7 @@ flowchart TB
 
 | Step | Where | What to show |
 |---|---|---|
-| 1 | Dashboard | 1,248 leads. "Not every lead deserves equal attention." |
+| 1 | Dashboard | 1,260 demo leads (1,248 generated plus 12 hero records). "Not every lead deserves equal attention." |
 | 2 | Leads | Filter to high-quality leads, point at the score ring |
 | 3 | Lead Details | Open **Acme Technologies (92)**, explain the score breakdown |
 | 4 | Lead Details | Show verification, data quality and the recommended next step |
@@ -144,20 +144,20 @@ flowchart TB
 | **Explainable lead scoring** | 0 to 100 score from 7 weighted factors | Reps trust and act on scores they can inspect |
 | **"Why this lead" insight** | 3 to 5 plain-language reasons per lead plus a next step | Turns data into a decision |
 | **Duplicate review** | Fuzzy match with side-by-side compare and merge | Stops two reps contacting the same company |
-| **Lead validation** | Email, domain and phone checks with live progress | Fewer bounces, protects sender reputation |
+| **Lead validation** | Simulated email and website checks with staged progress | Demonstrates review before outreach; no email is sent |
 | **Priority queue** | Default sort by score, high priority surfaced first | Effort goes to the best opportunities |
-| **Data quality rating** | Excellent / Good / Fair / Poor per record | Makes weak records visible before outreach |
+| **Data quality rating** | Completeness percentage and missing contact/company details | Makes weak records visible before outreach |
 
 ### Workflow
 
 | Feature | Details |
 |---|---|
-| **Filtering** | Industry, size, location, score range, verification, priority, revenue, technology, status. Removable chips. State lives in the URL so views are shareable |
+| **Filtering** | Industry, location, minimum score, verification, priority and status. State lives in the URL so views are shareable |
 | **Search** | Debounced, live result count, also available from the command palette |
-| **Bulk actions** | Select rows or "select all 1,248", then validate, save, export or mark contacted |
+| **Bulk actions** | Select rows or all 1,260 matching demo leads, then validate (up to 100), save, export or mark contacted |
 | **Export** | Real client-side CSV download with scope (all, filtered, selected) and field picker |
-| **Import** | Upload or paste CSV, preview with row-level hints, then import |
-| **Saved lists** | Create, rename and delete lists with undo |
+| **Import** | Upload CSV, preview row-level checks, then import valid records |
+| **Saved lists** | Create, edit, delete and export persistent lead lists |
 | **Command palette** | `Ctrl/Cmd + K` to search leads, jump to pages, run actions |
 | **Activity timeline** | Every action is logged on the lead |
 
@@ -179,23 +179,23 @@ flowchart TB
 
 ```
 ┌──────────────┬──────────────────────────────────────────────────────────────────┐
-│  PINPOINT    │  Leads  >  All leads            [ Search... ⌘K ]   🔔  ?  (AV)    │
+│  PINPOINT    │  Leads  >  All leads            [ Search... ⌘K ]   🔔  ?  (AV)  │
 │              ├──────────────────────────────────────────────────────────────────┤
-│  Overview    │  Leads                                                            │
-│  Leads  ◄──  │  Review, qualify and prioritize your pipeline.                    │
-│  Review (128)│                                                                   │
-│  Saved Lists │  [ Search ]  Filters  Sort  Columns          Import   Export      │
-│  Analytics   │  Industry: SaaS ✕   Score: 80+ ✕   Verified ✕        Clear all    │
+│  Overview    │  Leads                                                           │
+│  Leads  ◄──  │  Review, qualify and prioritize your pipeline.                   │
+│  Review (128)│                                                                  │
+│  Saved Lists │  [ Search ]  Filters  Sort  Columns          Import   Export     │
+│  Analytics   │  Industry: SaaS ✕   Score: 80+ ✕   Verified ✕        Clear all  │
 │              │  ─────────────────────────────────────────────────────────────── │
-│  ──────────  │  All 1,248 │ High Priority 186 │ Needs Review 128 │ Saved         │
+│  ──────────  │  All 1,260 │ High Priority 186 │ Needs Review 128 │ Saved        │
 │  Settings    │  ┌─┬────────────────┬─────────────┬────────┬───────┬──────────┐  │
-│  Help        │  │☐│ Company        │ Contact     │ Score  │Quality│ Priority │  │
+│  Help        │  │☐│ Company        │ Contact     │ Score  │Quality│ Priority │ │
 │              │  ├─┼────────────────┼─────────────┼────────┼───────┼──────────┤  │
-│              │  │☐│ Acme Tech      │ Sarah Chen  │ (92)   │ ✔ Exc.│ ▲ High   │  │
-│  (AV) Aniket │  │☐│ Northwind Labs │ Raj Patel   │ (87)   │ ✔ Good│ ▲ High   │  │
+│              │  │☐│ Acme Tech      │ Sarah Chen  │ (92)   │ ✔ Exc.│ ▲ High   │ │
+│  (AV) Aniket │  │☐│ Northwind Labs │ Raj Patel   │ (87)   │ ✔ Good│ ▲ High   │ │
 │  Admin       │  │☐│ Bluepeak Ltd   │ Mia Torres  │ (64)   │ ! Fair│ ● Medium │  │
 │              │  └─┴────────────────┴─────────────┴────────┴───────┴──────────┘  │
-│              │  Showing 1-25 of 1,248                          ‹ 1 2 3 ... 50 ›  │
+│              │  Showing 1-25 of 1,260                          ‹ 1 2 3 ... 51 › │
 └──────────────┴──────────────────────────────────────────────────────────────────┘
 ```
 
@@ -388,18 +388,18 @@ In Phase 1 the same flow is **simulated** locally with staged progress and deter
 
 | Concern | Choice | Why |
 |---|---|---|
-| Framework | React 18 + Vite + TypeScript (strict) | Fast dev loop, type safety, easy review |
+| Framework | React 19 + Vite + TypeScript (strict) | Fast dev loop, type safety, easy review |
 | Styling | Tailwind CSS v4 + shadcn/ui | Consistent tokens, accessible primitives |
 | Routing | React Router | URL-driven filter state, deep links |
 | Server state | TanStack Query | Loading, error and retry states for free |
 | Client state | Zustand (+ persist) | Tiny, no boilerplate, survives refresh |
-| Tables | TanStack Table | Sorting, selection, pagination, column visibility |
+| Tables | Semantic HTML tables | Accessible sorting, selection, pagination, column visibility |
 | Validation | Zod | One schema = runtime check + TypeScript type |
 | Charts | Recharts | Simple, declarative |
 | Icons | lucide-react | Consistent stroke weight |
 | Toasts | sonner | Subtle, accessible |
 | Fonts | Inter Variable, JetBrains Mono | Readable numbers, monospace for domains and emails |
-| Mock data | @faker-js/faker (fixed seed) | Reproducible 1,248-lead dataset |
+| Mock data | @faker-js/faker (fixed seed) | Reproducible 1,260-record demo (1,248 generated + 12 hero leads) |
 | CSV | PapaParse | Robust parse and unparse |
 | Tests | Vitest | Fast, Vite-native |
 
@@ -830,19 +830,23 @@ Manual acceptance checklist:
 
 ## 🗺 Roadmap
 
-### Phase 1: Frontend prototype
+### Phase 1: Frontend demo
 
-- [ ] App shell, sidebar, top bar, command palette
-- [ ] Leads table with search, filters, sort, selection, pagination
-- [ ] Lead score and score breakdown
-- [ ] Lead Details with "Why this lead" and data quality
-- [ ] Dashboard
-- [ ] Review Queue, duplicate compare and merge
-- [ ] Validation simulation
-- [ ] Export and import
-- [ ] Saved lists
-- [ ] Loading, empty and error states
-- [ ] Responsive and accessibility pass
+- [x] App shell, sidebar, top bar, command palette
+- [x] Leads table with search, basic filters, sort, column visibility, selection and pagination
+- [ ] Advanced employee-size, revenue, technology and score-range filters with removable filter chips
+- [x] Lead score and score breakdown
+- [x] Lead Details with "Why this lead" and data quality
+- [x] Dashboard
+- [x] Review Queue, duplicate compare and merge
+- [x] Validation simulation
+- [x] CSV export and import preview
+- [x] Saved lists with create, edit, delete and export
+- [ ] Undo after deleting a saved list
+- [x] Editable ideal-customer-profile weights with live re-scoring
+- [x] Loading, empty and error states
+- [x] Responsive desktop and mobile layouts
+- [ ] Complete keyboard and screen-reader accessibility audit
 
 ### Phase 2: Backend
 
@@ -857,7 +861,6 @@ Manual acceptance checklist:
 
 ### Later
 
-- [ ] Editable ideal-customer-profile weights with live re-scoring
 - [ ] CRM integrations (HubSpot, Salesforce)
 - [ ] Outcome-based score tuning from win/loss data
 - [ ] Email draft generation for the recommended next step
